@@ -122,7 +122,7 @@ The detached `:9800` process has no console, so tracing goes to stdout
 directory). Tail on the host:
 
 ```bash
-tail -f S:/rust/GSV/telenetis/target/live/logs/telenetis.log.$(date +%F)
+tail -f S:/rust/telenetis/target/live/logs/telenetis.log.$(date +%F)
 ```
 
 Startup always logs `telenetis file log at <dir>` + `Telenetis starting
