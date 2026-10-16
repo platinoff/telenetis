@@ -9,6 +9,13 @@
 - **Kit registration**: row in `S:/rust/GSV/docs/gsv/PRODUCTS.md`; keep-live band 224
   (Windows parity: watchdog copies debug → live and respawns `:9800`);
   GSV MCP probe `gsv_telenetis_health`.
+- **Latest work (2026-10-15, first plugin band — sibling take-over)**: `:9800` now runs from
+  this sibling tree (`target/live/telenetis.exe` via `target/debug/telenetis-live.exe`); the
+  old nested `GSV/telenetis/target/` leftover is gone and the GSV watchdog resolves
+  `telenetis_crate_dir` → `S:/rust/telenetis`. `/health` stops reporting the `0.1.0`
+  placeholder: it now reads `env!("CARGO_PKG_VERSION")` and the crate bumped **0.1.0 → 0.2.0**
+  (keep-live `telenetis.version` = `0.2.0`). Band journal starts here; GSV rows T1–T29 stay in
+  the GSV log. Gate: fmt clean · clippy 0 · **330** green (314 lib + 4 live + 4 integration).
 - **Latest work (2026-09-24, keep-green)**: fixed test rot in `proxy_get_stays_open_for_reads`
   (GET `/edge/upstream/poolai/...` asserted 404 but routing changed — a real upstream answers
   502 against a dead pool; the gate intent is "unknown service → 404", now uses `nosuch`).

@@ -1460,7 +1460,7 @@ async fn health() -> Json<serde_json::Value> {
     Json(json!({
         "status": "ok",
         "service": "telenetis",
-        "version": "0.1.0"
+        "version": env!("CARGO_PKG_VERSION")
     }))
 }
 
@@ -1807,6 +1807,13 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(resp.status(), StatusCode::OK);
+        let body = axum::body::to_bytes(resp.into_body(), 4096).await.unwrap();
+        let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
+        assert_eq!(
+            json["version"],
+            env!("CARGO_PKG_VERSION"),
+            "/health must report the crate semver, not a placeholder"
+        );
     }
 
     #[tokio::test]
