@@ -1,6 +1,6 @@
 # Telenetis — HANDOFF (new session)
 
-- **Root**: `S:/rust/telenetis` (own git repo — extracted from the GSV kit tree on 2026-10-15; origin `github.com/platinoff/telenetis`, private). **Role:** portable **plugin** (Telegram shell). Hub is GSV `:9999`. Builds land in this crate's own `target/` (detached workspace; no GSV target sharing).
+- **Root**: `S:/rust/telenetis` (own git repo — extracted from the GSV kit tree on 2026-10-15; origin `github.com/platinoff/telenetis`, public). **Role:** portable **plugin** (Telegram shell). Hub is GSV `:9999`. Builds land in this crate's own `target/` (detached workspace; no GSV target sharing). Bot token, webhook secret, ngrok authtoken, and `GSV_EDGE_TOKEN` stay in the local `.env` (gitignored). Another operator mints their own and points `TELENETIS_GSV_URL` at their hub.
 - **Owner 2026-09-17:** next `agi` from the GSV window **auto-picks this crate**. **Rabbit:** Redmi 9 on **wireless debug**. ADB on host `GSV/target/adb/platform-tools/adb.exe` — devices empty until owner sends pair `IP:port` + 6-digit code (`adb pair` / `adb connect`). Play from hub: Mini App `:9800` (live LAN `192.168.2.238`) + GSV `/api/edge`. Do not talk to poolAI `:8091` off-box. Do not grow this Mini App into a second brain. Runbook [`TWO_PHONES.md`](./TWO_PHONES.md) §KVM. Open: T23.1 ping, T26.1 pong after Start, T32.1 download watch.
 - **What it is**: standalone Rust (Axum 0.8, Tokio) Telegram Mini App + Bot bridging the
   GSV Godfather channel — server on **port 9800**. Docs:
