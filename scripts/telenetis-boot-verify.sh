@@ -74,7 +74,7 @@ fi
 echo -n "SSE  /events (headers) ....... "
 CT="$(curl -o /dev/null -s --max-time 4 \
   -H 'Accept: text/event-stream' \
-  -D - "$BASE/events" | grep -i '^content-type:' | tr -d '\r')"
+  -D - "$BASE/events" | rg -i '^content-type:' | tr -d '\r')"
 case "$CT" in
   *text/event-stream*) echo "ok ($CT)"; PASS=$((PASS + 1)) ;;
   *) echo "FAIL ($CT)"; FAIL=$((FAIL + 1)) ;;
