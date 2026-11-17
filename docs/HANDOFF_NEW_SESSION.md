@@ -1,34 +1,65 @@
-# Telenetis — HANDOFF (new session)
+# Передача контексту новій сесії (Telenetis)
 
-- **Root**: `S:/rust/telenetis` (own git repo — extracted from the GSV kit tree on 2026-10-15; origin `github.com/platinoff/telenetis`, public). **Role:** portable **plugin** (Telegram shell). Hub is GSV `:9999`. Builds land in this crate's own `target/` (detached workspace; no GSV target sharing). Bot token, webhook secret, ngrok authtoken, and `GSV_EDGE_TOKEN` stay in the local `.env` (gitignored). Another operator mints their own and points `TELENETIS_GSV_URL` at their hub.
-- **Owner 2026-09-17:** next `agi` from the GSV window **auto-picks this crate**. **Rabbit:** Redmi 9 on **wireless debug**. ADB on host `GSV/target/adb/platform-tools/adb.exe` — devices empty until owner sends pair `IP:port` + 6-digit code (`adb pair` / `adb connect`). Play from hub: Mini App `:9800` (live LAN `192.168.2.238`) + GSV `/api/edge`. Do not talk to poolAI `:8091` off-box. Do not grow this Mini App into a second brain. Runbook [`TWO_PHONES.md`](./TWO_PHONES.md) §KVM. Open: T23.1 ping, T26.1 pong after Start, T32.1 download watch.
-- **What it is**: standalone Rust (Axum 0.8, Tokio) Telegram Mini App + Bot bridging the
-  GSV Godfather channel — server on **port 9800**. Docs:
-  [`README.md`](./README.md) · [`ops.md`](./ops.md)
-  (Docker / systemd / Windows always-on supervisor).
-- **Kit registration**: row in `S:/rust/GSV/docs/gsv/PRODUCTS.md`; keep-live band 224
-  (Windows parity: watchdog copies debug → live and respawns `:9800`);
-  GSV MCP probe `gsv_telenetis_health`.
-- **Latest work (2026-10-15, first plugin band — sibling take-over)**: `:9800` now runs from
-  this sibling tree (`target/live/telenetis.exe` via `target/debug/telenetis-live.exe`); the
-  old nested `GSV/telenetis/target/` leftover is gone and the GSV watchdog resolves
-  `telenetis_crate_dir` → `S:/rust/telenetis`. `/health` stops reporting the `0.1.0`
-  placeholder: it now reads `env!("CARGO_PKG_VERSION")` and the crate bumped **0.1.0 → 0.2.0**
-  (keep-live `telenetis.version` = `0.2.0`). Band journal starts here; GSV rows T1–T29 stay in
-  the GSV log. Gate: fmt clean · clippy 0 · **330** green (314 lib + 4 live + 4 integration).
-- **Latest work (2026-09-24, keep-green)**: fixed test rot in `proxy_get_stays_open_for_reads`
-  (GET `/edge/upstream/poolai/...` asserted 404 but routing changed — a real upstream answers
-  502 against a dead pool; the gate intent is "unknown service → 404", now uses `nosuch`).
-  Toolchain: use `PATH="/c/Users/plati/.cargo/bin:..."` — MSYS2 `rustc 1.87` shadows the
-  rustup 1.92.0-gnu pin otherwise (`encoding_rs`/`icu` need 1.88+). Gate: 330 green.
-- **Latest work (2026-09-17, bands T1–T7, all ticket-driven)**: reopen-hint on stale initData (403),
-  `answerWebAppQuery` builder (wiring verdict: no keyboard-flow → none needed),
-  probe compatibility-mode, claim/next hints (snapshot + `/board`),
-  Download auto-save (IDB is cache), sticky model auto-Use, worker chain memory
-  (`payload.history`), WS tracker `GET /tracker` + client announce.
-  Concept: [`CONCEPT.md`](./CONCEPT.md).
-- **Tests**: `cargo fmt -- --check` → `cargo clippy --all-targets` (0) → `cargo test`
-  (**314** lib + 4 live + 4 integration, green)
-  (run in `S:/rust/telenetis`). Do **not** kill the live `:9800` copy before tests.
-- **Health**: `GET http://127.0.0.1:9800/health` (GSV `keep_live.telenetis`, fresh = up).
-- **NEXT pointer**: [`NEXT_SESSION_PROMPT.md`](./NEXT_SESSION_PROMPT.md).
+**Оновлено:** 2026-11-17 (Symbiosis P1 ✅ — цей файл створено; GSV канон [`docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md`](../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md))
+
+> **Екосистемний канон (2026-11-17):** [`../../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md`](../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md)
+> — GSV «тато» (операційний план: Galaxy UI, tickets board, keep-live, mesh, MCP) ·
+> poolAI «мама» (FM/management план). Telenetis — **commutation** (switching) плагін:
+> Telegram Mini App + workers/flows + GSV forward. Не переносимо й не розширюємо в галактичний
+> оркестр — перемикання лише.
+
+## Призначення
+
+Telenetis — плагін, що цілить у **саму комунікацію** між:
+- Telegram Bot API (webhook, Mini App, initData HMAC-SHA256, theme/platform/backoff/cold-start UX),
+- GSV-хабом (`/api/tickets/*`, `/api/telegram/*`, `:9999`) — forward Mini-App дій робітників
+  (claim/done/error/reclaim), presence та flow sync,
+- workers (роздача task envelopes подій у подійну шину),
+- Mini App на `:9800` (`/health`, `/api/verify`, `/api/board/*`, `/api/snapshot`).
+
+Не входить: inference, tensor ops, KVM, APK edge, 49-device RAID — це engines (llama-rs / rusty-engine)
+і Hub (GSV). Не SSU-оркестратор.
+
+## Стан на 2026-11-17 (знято з живого боксу)
+
+| Що | Значення |
+|----|----------|
+| HEAD | `7efad09` (master, synced origin/master) |
+| Crate | **0.2.0** (`Cargo.toml`) |
+| Port | **:9800** (live; `/health`) |
+| Wiring | OpenCode/Grok/Cursor `ok` (GSV audit 2026-11-17) |
+| Keep-live | GSV watchdog мульти-пробує `:9800` (`telenetis_alive`) + `telenetis_debug_newer` (band 228) |
+| MCP peer | `gsv_telenetis_health` (band 226, fail-open при `down`) |
+| Tests | `cargo fmt -- --check` → `cargo clippy --all-targets` → `cargo test` (~177 у band 223; точна кількість — на наступному дрені) |
+| Збірка | MSYS2 bash; `unset RUSTUP_TOOLCHAIN`; windows-gnu ціль |
+
+## Ключові файли
+
+- `AGENTS.md` — локальний канон (те, що змінити не треба).
+- `src/security/initdata.rs` — initData HMAC-SHA256 verify (band 214).
+- `src/ui/miniapp.rs` + `src/ui/static/app.js` — Mini App layer (band 215).
+- `src/stream/backoff.rs` + `src/stream/ws.rs` — live stream primacy (band 216).
+- `src/actions.rs` — BoardAction (claim/done/error/reclaim) + availability per status (bands 218/219).
+- `src/gsv/poll.rs` + `src/gsv/client.rs` — bus polling + board forward (5 s timeout, wire-contract fix band 222).
+- `deploy/systemd/telenetis.service`, `docker-compose.yml`, `scripts/telenetis-boot-verify.sh` — prod ops (band 221).
+
+## Робочий процес (дзеркало екосистеми)
+
+1. S0 — диск S: `df -h /s | tail -1` (≥5 GiB вільний); `git fetch`; `git status -sb`; `git log -1 --oneline`.
+2. Прочитати цей файл + `docs/NEXT_SESSION_PROMPT.md` + GSV `AGENTS.md` (global-first).
+3. Drain наступного банду: HANDOFF/NEXT → код → формат → тести → один commit → push.
+4. Квитки: GSV `tickets.jsonl` (`gsv_tickets*`) або `gsv_telenetis_health` для keep-live-стану.
+5. Пуш лише на завершення банду; **один** commit на банд.
+
+## Правила
+
+- **MSYS2 bash**, не PowerShell. PATH: `/c/Users/plati/.cargo/bin:/ucrt64/bin:/usr/bin:/c/msys64/usr/bin`.
+- `unset RUSTUP_TOOLCHAIN` — перемагає `rust-toolchain.toml`.
+- Не копіювати VDT kit сюди; не User-scope MCP; не робити цей репо оркестратором.
+- `:9800` — єдиний порт репо; GSV на `:9999` і `/api/edge` — лише через токен; `:8091` не чіпати.
+- Rust ≥95 %; Python = 0; `data/*`, `.env*`, `*.pem` — не в git.
+
+## Відкриті питання (owner)
+
+- PRODUCTS.md містить telenetis-ряди з HANDOFF/NEXT — тепер обидва файли існують; вказівник у FM poolAI (`docs/development/NEXT_SESSION_PROMPT.md`) — перевірити на poolAI дрені.
+- keep-live: watchdog probe на `:9800` (band 228) — чи переходити на systemd `Restart=always` (prod-шлях band 221)?

@@ -1,28 +1,23 @@
-# Telenetis — Next Session Prompt
+# Промпт наступної сесії (Telenetis)
 
-**Owner product pick: telenetis** (next `agi` in the GSV window skips AskQuestion).
+**Оновлено:** 2026-11-17 (Symbiosis P1 — HANDOFF/NEXT створено)
 
-0. Keep-live GSV `:9999` + this `:9800`. Redmi 9 = Wi-Fi debug rabbit.
-   Host ADB: `S:/rust/GSV/target/adb/platform-tools/adb.exe` (`adb devices` is
-   empty until pair). Owner: Developer → Wireless debugging → pair by code →
-   send IP:port + 6 digits. Then `adb pair` + `adb connect` → screenshots / taps
-   / logcat from the hub. Never `:8091` off-box. Never a second GSV.
-1. `cargo test` in `S:/rust/telenetis` — keep green (314+4+4); check
-   `GET /health` on `:9800` (crate semver, now `0.2.0`) and GSV `keep_live.telenetis` row
-   (MCP `gsv_telenetis_health`; watchdog respawns from this sibling tree).
-2. Gates needing owner/phones (do NOT code around): token rotate
-   (`t-1789606660639448500`), group ownership (`t-1789606667836911200`),
-   phone verify — worker-controls, tensor PoC, P2P byte measure, compat probe.
-   Two phones in the chat only after a green emulator
-   (`cargo test --test phone_emulator`), following
-   [`TWO_PHONES.md`](./TWO_PHONES.md) (watch
-   `/api/edge/tracker/status` while they tap).
-3. Follow-ups: host-side chat sessions (poolAI repo, payload already supports
-   `history`); Bot API 10.x origin-hardening watch vs tunnel URL (CONCEPT §1).
-4. One commit in **this** repo (`S:/rust/telenetis`, own git repo since 2026-10-15),
-   then `git push origin main`. Message style: `# Telenetis: <what>`; no `git add -A`,
-   no `data/*` staging.
+> **Екосистемний канон:** [`../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md`](../../GSV/docs/gsv/GSV_ECOSYSTEM_SYMBIOSIS.md) — GSV «тато» / poolAI «мама». Telenetis = commutation (switching) плагін.
 
-Sources: [`HANDOFF_NEW_SESSION.md`](./HANDOFF_NEW_SESSION.md) ·
-[`ops.md`](./ops.md) · [`README.md`](./README.md) ·
-[`CONCEPT.md`](./CONCEPT.md).
+**Канон для відкриття:** `S:\rust\telenetis` (Cursor/OpenCode/Grok) · глобальні правила — GSV `AGENTS.md` · `GSV_AGI_PATH.md`. Читай `docs/HANDOFF_NEW_SESSION.md` (правила, стан, файли) · FM/тикети — GSV `docs/gsv/tickets.jsonl`.
+
+**Старт сесії (порядок):**
+
+1. `df -h /s | tail -1` (вільного диска ≥ 5 ГіБ) → у telenetis свого `cargo xtask disk` нема; під час важких збірок стежити за RAM.
+2. `git fetch` → `git status -sb` → `git log -1 --oneline` (HEAD: `7efad09`).
+3. Гейти: `cargo fmt -- --check` → `cargo clippy --all-targets` → `cargo test` (MSYS2 bash; `unset RUSTUP_TOOLCHAIN`; windows-gnu).
+4. Лайв-служба: `:9800` (`/health`); keep-live — GSV watchdog (`telenetis_alive`); при GSV down — `gsv_telenetis_health` fail-open.
+
+**Поточний фокус (owner 2026-11-17):**
+- Екосистему переведено на канон «тато і мама» (GSV ↔ poolAI) — дивись GSV `HANDOFF_NEW_SESSION.md` та symbiosis canon.
+- Telenetis: постійний стан — Mini App + board forward + presence/flows; CI-зелені ворота перед будь-яким дреном; один commit на банд.
+- Кандидати смуги: prod-остаточне переведення `:9800` на systemd (`Restart=always`) з `deploy/systemd/telenetis.service`; доповнення `boot-verify` на фактичному хості; presence-fed sync тестів для `/api/board` з GSV.
+
+**Continuity (для сесій з GSV вікна):** `абракадабра` → вибір продукту через AskQuestion / `cargo xtask products` — telenetis з'являється як окреме середовищне дерево, не як пара hardcoded.
+
+**Кінець сесії:** один commit (код + docs) → `git push` на `master` → самарі в чат.
