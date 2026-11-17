@@ -222,7 +222,14 @@ mod tests {
 
     #[test]
     fn metainfo_roundtrip_shape_and_stable_hash() {
-        let dir = std::env::temp_dir().join(format!("tns-tor-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!(
+            "tns-tor-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let file = dir.join("tiny.gguf");
@@ -239,7 +246,7 @@ mod tests {
 
     #[test]
     fn metainfo_missing_file_errors() {
-        let missing = std::env::temp_dir().join("tns-tor-nope.gguf");
+        let missing = crate::test_scratch::test_tmp("tns-tor-nope.gguf");
         let _ = std::fs::remove_file(&missing);
         assert!(metainfo_for_file(&missing, "nope.gguf", vec![]).is_err());
     }

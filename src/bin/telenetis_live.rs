@@ -113,7 +113,11 @@ mod tests {
     static ENV_SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
     fn sandbox(tag: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!(
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("target")
+            .join("test-tmp");
+        let _ = std::fs::create_dir_all(&root);
+        let dir = root.join(format!(
             "tns-live-resolve-{}-{}-{}",
             std::process::id(),
             tag,

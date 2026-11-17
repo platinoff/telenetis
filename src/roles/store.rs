@@ -148,7 +148,7 @@ mod tests {
         let mut store = RoleStore::new();
         store.assign_role("j1", Role::Host);
         store.assign_role("j2", Role::Mate);
-        let path = std::env::temp_dir().join("telenetis_roles_test.jsonl");
+        let path = crate::test_scratch::test_tmp("telenetis_roles_test.jsonl");
         store.save_jsonl(&path).unwrap();
         let loaded = RoleStore::load_jsonl(&path);
         assert_eq!(loaded.get_role("j1"), Some(Role::Host));

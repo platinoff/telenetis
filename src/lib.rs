@@ -1,3 +1,6 @@
+#[cfg(test)]
+pub(crate) mod test_scratch;
+
 pub mod actions;
 pub mod bot;
 pub mod config;

@@ -9,7 +9,16 @@
 use std::env;
 
 /// Whether the running exe is a rustc test-harness artifact (`deps/`).
+///
+/// `cfg!(test)` is authoritative for the unit-test build and is immune to
+/// EDR renaming/quarantining the test executable's path (which otherwise
+/// breaks `current_exe()`-based detection and picks the LAN address under
+/// band 233 LAN-first). The path check remains as a fallback for stray
+/// usages.
 pub fn is_cargo_test_harness() -> bool {
+    if cfg!(test) {
+        return true;
+    }
     env::current_exe()
         .ok()
         .map(|p| p.to_string_lossy().replace('\\', "/").contains("/deps/"))

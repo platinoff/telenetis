@@ -269,7 +269,7 @@ mod tests {
 
     #[test]
     fn lifecycle_freezes_timers_in_background() {
-        let dir = std::env::temp_dir().join("emu_lifecycle_unit");
+        let dir = crate::test_scratch::test_tmp("emu_lifecycle_unit");
         let _ = std::fs::remove_dir_all(&dir);
         let mut phone = EmuPhone::new("p1", dir, USER).unwrap();
         assert!(phone.timers_live());
@@ -282,7 +282,7 @@ mod tests {
 
     #[test]
     fn kill_drops_cache_keeps_disk() {
-        let dir = std::env::temp_dir().join("emu_kill_unit");
+        let dir = crate::test_scratch::test_tmp("emu_kill_unit");
         let _ = std::fs::remove_dir_all(&dir);
         let mut phone = EmuPhone::new("p1", dir.clone(), USER).unwrap();
         phone.storage.save_to_disk("m.gguf", b"bytes").unwrap();
@@ -297,7 +297,7 @@ mod tests {
 
     #[test]
     fn evict_is_os_pressure_cache_only() {
-        let dir = std::env::temp_dir().join("emu_evict_unit");
+        let dir = crate::test_scratch::test_tmp("emu_evict_unit");
         let _ = std::fs::remove_dir_all(&dir);
         let mut phone = EmuPhone::new("p1", dir.clone(), USER).unwrap();
         phone.storage.save_to_disk("m.gguf", b"bytes").unwrap();
@@ -310,7 +310,7 @@ mod tests {
 
     #[test]
     fn persist_flag_defaults_off_grants_on_request() {
-        let dir = std::env::temp_dir().join("emu_persist_unit");
+        let dir = crate::test_scratch::test_tmp("emu_persist_unit");
         let _ = std::fs::remove_dir_all(&dir);
         let mut phone = EmuPhone::new("p1", dir.clone(), USER).unwrap();
         assert!(!phone.storage.persist_granted());
@@ -329,7 +329,7 @@ mod tests {
 
     #[test]
     fn sanitize_keeps_disk_dir_safe() {
-        let dir = std::env::temp_dir().join("emu_sanitize_unit");
+        let dir = crate::test_scratch::test_tmp("emu_sanitize_unit");
         let _ = std::fs::remove_dir_all(&dir);
         let phone = EmuPhone::new("p1", dir.clone(), USER).unwrap();
         let path = phone.storage.save_to_disk("../../evil", b"x").unwrap();

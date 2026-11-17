@@ -125,7 +125,7 @@ mod tests {
 
     #[test]
     fn persist_roundtrip_keeps_only_on() {
-        let dir = std::env::temp_dir().join(format!("tns-consent-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!("tns-consent-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let file = dir.join("testmode.jsonl");
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     fn load_ignores_garbage_lines() {
-        let dir = std::env::temp_dir().join(format!("tns-consent-g-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!("tns-consent-g-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let file = dir.join("testmode.jsonl");

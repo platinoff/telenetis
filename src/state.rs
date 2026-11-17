@@ -418,7 +418,7 @@ mod tests {
 
     #[tokio::test]
     async fn roles_assign_and_persist_roundtrip() {
-        let file = std::env::temp_dir().join(format!(
+        let file = crate::test_scratch::test_tmp(format!(
             "telenetis_roles_state_{}.jsonl",
             std::process::id()
         ));

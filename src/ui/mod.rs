@@ -1786,7 +1786,7 @@ mod tests {
             tunnel_enabled: false,
             ngrok_bin: None,
         };
-        let file = std::env::temp_dir().join(format!(
+        let file = crate::test_scratch::test_tmp(format!(
             "telenetis_roles_ui_{tag}_{}.jsonl",
             std::process::id()
         ));
@@ -2126,7 +2126,7 @@ mod tests {
     /// a sibling, so no test touches the repo `data/` tree).
     fn tm_state() -> (AppState, std::path::PathBuf) {
         let n = TM_DIR_CTR.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-        let dir = std::env::temp_dir().join(format!("tns-tm-http-{}-{n}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!("tns-tm-http-{}-{n}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let cfg = Config {
@@ -2464,7 +2464,7 @@ mod tests {
             ngrok_bin: None,
         };
         cfg.bot_token = "test".to_string();
-        let file = std::env::temp_dir().join(format!(
+        let file = crate::test_scratch::test_tmp(format!(
             "telenetis_roles_ui_assign_{}.jsonl",
             std::process::id()
         ));
@@ -2584,7 +2584,7 @@ mod tests {
 
     #[tokio::test]
     async fn roles_persist_jsonl_and_reload() {
-        let file = std::env::temp_dir().join(format!(
+        let file = crate::test_scratch::test_tmp(format!(
             "telenetis_roles_ui_persist_{}.jsonl",
             std::process::id()
         ));
@@ -3576,7 +3576,14 @@ mod tests {
         // Hermetic: temp model dir; env restored after (guarded: shares
         // TELENETIS_MODEL_DIR with the config tests).
         let _guard = crate::ui::vendor::ENV_GUARD.lock().await;
-        let dir = std::env::temp_dir().join(format!("tns-tor-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!(
+            "tns-tor-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("tiny.gguf"), vec![9u8; 2048]).unwrap();
@@ -3627,7 +3634,7 @@ mod tests {
         // Hermetic: temp model dir with one GGUF; env restored after.
         // Guarded: vendor shape test mutates the same process var.
         let _guard = crate::ui::vendor::ENV_GUARD.lock().await;
-        let dir = std::env::temp_dir().join(format!("tns-cfg-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!("tns-cfg-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("tiny.gguf"), vec![0u8; 2048]).unwrap();
@@ -3687,7 +3694,7 @@ mod tests {
     async fn models_serve_records_download_with_peer() {
         // T30.1: the journal answers "which IP downloaded the model".
         let _guard = crate::ui::vendor::ENV_GUARD.lock().await;
-        let dir = std::env::temp_dir().join(format!("tns-mdl-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!("tns-mdl-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("tiny.gguf"), vec![7u8; 2048]).unwrap();
@@ -3739,7 +3746,7 @@ mod tests {
         // T13.2: navigation-to-file must also land in Downloads (not render).
         // Vendor runtime stays inline (the page fetches it, never saves it).
         let _guard = crate::ui::vendor::ENV_GUARD.lock().await;
-        let dir = std::env::temp_dir().join(format!("tns-matt-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!("tns-matt-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("tiny.gguf"), vec![7u8; 512]).unwrap();
@@ -3772,7 +3779,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
 
         // Vendor runtime stays inline: no attachment on its bytes.
-        let vdir = std::env::temp_dir().join(format!("tns-matt-v-{}", std::process::id()));
+        let vdir = crate::test_scratch::test_tmp(format!("tns-matt-v-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&vdir);
         std::fs::create_dir_all(vdir.join("wllama")).unwrap();
         std::fs::write(vdir.join("wllama/index.js"), b"var x=1;").unwrap();
@@ -3799,9 +3806,19 @@ mod tests {
 
     #[tokio::test]
     async fn vendor_serve_roundtrip_range_and_traversal() {
-        // Hermetic: temp vendor dir; env restored after. No guard needed —
-        // no other test touches TELENETIS_VENDOR_DIR.
-        let dir = std::env::temp_dir().join(format!("tns-vnd-{}", std::process::id()));
+        // Hermetic: temp vendor dir; env restored after. The sibling
+        // `models_serve_sends_attachment_disposition` mutates the same
+        // process-global TELENETIS_VENDOR_DIR under ENV_GUARD — serialize
+        // with it (or the two race on the env var in parallel).
+        let _guard = crate::ui::vendor::ENV_GUARD.lock().await;
+        let dir = crate::test_scratch::test_tmp(format!(
+            "tns-vnd-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(dir.join("wllama")).unwrap();
         std::fs::write(dir.join("wllama/index.js"), b"var x=1;").unwrap();

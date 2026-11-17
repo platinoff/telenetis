@@ -219,7 +219,7 @@ mod tests {
 
     #[test]
     fn resolve_stays_under_root() {
-        let dir = std::env::temp_dir().join(format!("tns-vendor-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!("tns-vendor-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(dir.join("sub")).unwrap();
         std::fs::write(dir.join("sub/f.js"), b"x").unwrap();
@@ -251,7 +251,7 @@ mod tests {
 
     #[test]
     fn list_models_orders_largest_first() {
-        let dir = std::env::temp_dir().join(format!("tns-models-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!("tns-models-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("small.gguf"), vec![0u8; 100]).unwrap();
@@ -273,7 +273,7 @@ mod tests {
         // (never rely on machine-global state like the sibling tree).
         let _guard = ENV_GUARD.blocking_lock();
         let prev = std::env::var_os("TELENETIS_MODEL_DIR");
-        let dir = std::env::temp_dir().join(format!("tns-nomodels-{}", std::process::id()));
+        let dir = crate::test_scratch::test_tmp(format!("tns-nomodels-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         std::env::set_var("TELENETIS_MODEL_DIR", &dir);
