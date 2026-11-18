@@ -22,7 +22,7 @@
   (GET `/edge/upstream/poolai/...` asserted 404 but routing changed — a real upstream answers
   502 against a dead pool; the gate intent is "unknown service → 404", now uses `nosuch`).
   Toolchain: use `PATH="/c/Users/plati/.cargo/bin:..."` — MSYS2 `rustc 1.87` shadows the
-  rustup 1.92.0-gnu pin otherwise (`encoding_rs`/`icu` need 1.88+). Gate: 330 green.
+  rustup 1.100.0-gnu pin otherwise (`encoding_rs`/`icu` need 1.88+). Gate: 330 green.
 - **Latest work (2026-09-17, bands T1–T7, all ticket-driven)**: reopen-hint on stale initData (403),
   `answerWebAppQuery` builder (wiring verdict: no keyboard-flow → none needed),
   probe compatibility-mode, claim/next hints (snapshot + `/board`),
